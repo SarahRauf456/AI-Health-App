@@ -1,5 +1,9 @@
-# AI-Health-Appimport streamlit as st
+# AI-Health-App
+import streamlit as st
+st.title("AI Health & Nutrition Analyzer")
+st.write("Welcome to your personalized health dashboard!")
 import pandas as pd
+import numpy as np
 
 # -------------------------
 # CONFIG (Dark Theme)
