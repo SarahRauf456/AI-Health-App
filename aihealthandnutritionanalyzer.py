@@ -1,16 +1,11 @@
-# AI-Health-App
 import streamlit as st
 st.title("AI Health & Nutrition Analyzer")
 st.write("Welcome to your personalized health dashboard!")
 import pandas as pd
 import numpy as np
-
-# -------------------------
-# CONFIG (Dark Theme)
-# -------------------------
 st.set_page_config(page_title="AI Health & Nutrition Analyzer", layout="wide")
 
-# Inject custom CSS for dark theme
+
 st.markdown("""
     <style>
         body {
@@ -33,23 +28,17 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# -------------------------
-# APP TITLE
-# -------------------------
+
 st.title("🩺 AI Health & Nutrition Analyzer")
 st.write("Personalized health and nutrition insights using AI-powered recommendations.")
 
-# -------------------------
-# Sidebar Navigation
-# -------------------------
+
 page = st.sidebar.selectbox(
     "Navigate",
     ["🏠 Home", "📝 Input Data", "📊 Nutrition Plan", "💡 Smart Tips"]
 )
 
-# -------------------------
-# PAGE 1 - Home
-# -------------------------
+
 if page == "🏠 Home":
     st.header("Welcome! 👋")
     st.write("""
@@ -58,16 +47,15 @@ if page == "🏠 Home":
     and health insights.
     
     Unlike generic apps, our system uses AI to provide smart, science-backed recommendations 
-    tailored to each individual.  Project By : Group 1
+    tailored to each individual.  
+    PROJECT BY : GROUP 1 IIT PATNA    
     """)
 
-# -------------------------
-# PAGE 2 - Input Data
-# -------------------------
+
 if page == "📝 Input Data":
     st.header("Enter Your Details")
 
-    # Collect user data
+    
     name = st.text_input("Name")
     age = st.number_input("Age", 1, 100, 25)
     weight = st.number_input("Weight (kg)", 30, 200, 70)
@@ -75,7 +63,7 @@ if page == "📝 Input Data":
     activity = st.selectbox("Activity Level", ["Low", "Moderate", "High"])
     diet_type = st.selectbox("Diet Preference", ["Vegetarian", "Non-Vegetarian", "Vegan"])
 
-    # Save input to session state
+    
     if st.button("Save Data"):
         st.session_state['user_data'] = {
             "name": name,
@@ -87,14 +75,12 @@ if page == "📝 Input Data":
         }
         st.success("✅ Data saved! Now go to Nutrition Plan page.")
 
-# -------------------------
-# Helper Function: Generate Nutrition Plan
-# -------------------------
+
 def generate_nutrition_plan(data):
     bmi = data['weight'] / ((data['height'] / 100) ** 2)
     plan = []
 
-    # Basic calorie estimate
+    
     if data['activity'] == "Low":
         calories = data['weight'] * 25
     elif data['activity'] == "Moderate":
@@ -102,12 +88,12 @@ def generate_nutrition_plan(data):
     else:
         calories = data['weight'] * 35
 
-    # Macronutrient breakdown
-    protein = data['weight'] * 1.2  # grams
+    
+    protein = data['weight'] * 1.2  
     carbs = calories * 0.5 / 4
     fats = calories * 0.25 / 9
 
-    # Add personalized tips
+    
     if bmi < 18.5:
         plan.append("Increase calorie intake with nutrient-dense foods.")
     elif bmi > 25:
@@ -127,10 +113,6 @@ def generate_nutrition_plan(data):
         "Fats (g)": round(fats),
         "Tips": plan
     }
-
-# -------------------------
-# PAGE 3 - Nutrition Plan
-# -------------------------
 if page == "📊 Nutrition Plan":
     st.header("Your AI-Powered Nutrition Plan")
     if 'user_data' not in st.session_state:
@@ -149,9 +131,7 @@ if page == "📊 Nutrition Plan":
         for tip in plan["Tips"]:
             st.info(tip)
 
-# -------------------------
-# PAGE 4 - Smart Tips
-# -------------------------
+
 if page == "💡 Smart Tips":
     st.header("AI Smart Recommendations")
     st.write("💡 Here are some science-backed health & nutrition tips:")
