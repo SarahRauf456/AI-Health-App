@@ -2,10 +2,15 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-st.set_page_config(page_title="AI Health & Nutrition Analyzer", layout="wide")
 @st.cache_data
 def load_food_data():
-    return pd.read_csv("data/foods.csv")
+    df1 = pd.read_csv("data/foods.csv")
+    df2 = pd.read_csv("data/foods2.csv")
+
+
+    df1.columns = df1.columns.str.strip()
+    df2.columns = df2.columns.str.strip()
+
 
 @st.cache_data
 def load_exercise_data():
@@ -46,6 +51,11 @@ if page == "🏠 Home":
     Our AI system generates personalized nutrition plans, hydration tracking,
     exercise recommendations and weekly meal planning.
     PROJECT BY : GROUP 1  
+    Sharfia
+    Novesh
+    Akash
+    Ahana
+    Harsh
     """)
 if page == "📝 Input Data":
     st.header("Enter Your Details")
