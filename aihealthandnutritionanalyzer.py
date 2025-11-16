@@ -3,7 +3,16 @@ import pandas as pd
 import numpy as np
 
 st.set_page_config(page_title="AI Health & Nutrition Analyzer", layout="wide")
+@st.cache_data
+def load_food_data():
+    return pd.read_csv("data/foods.csv")
 
+@st.cache_data
+def load_exercise_data():
+    return pd.read_csv("data/exercises.csv")
+
+foods_df = load_food_data()
+ex_df = load_exercise_data()
 
 st.markdown("""
     <style>
@@ -24,28 +33,20 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
-
-st.title("🩺 AI Health & Nutrition Analyzer")
-st.write("Personalized health, diet, hydration and exercise recommendations.")
-
-
 page = st.sidebar.selectbox(
     "Navigate",
-    ["🏠 Home", "📝 Input Data", "📊 Nutrition Plan", "🤖 Diet Chatbot",
+    ["🏠 Home", "📝 Input Data", "📊 Nutrition Plan", "🍎 Food Finder", "🤖 Diet Chatbot",
      "💧 Hydration Tracker", "🏋️ Simple Exercises", "📅 Meal Forecasting", "💡 Smart Tips"]
 )
 
-
+st.title("🩺 AI Health & Nutrition Analyzer")
 if page == "🏠 Home":
     st.header("Welcome! 👋")
     st.write("""
     Our AI system generates personalized nutrition plans, hydration tracking,
-    workout suggestions and weekly meal planning based on your profile.
-    PROJECT BY : GROUP 1 IIT PATNA Sharfia,Novesh, Akash, Ahana, Harsh.   
+    exercise recommendations and weekly meal planning.
+    PROJECT BY : GROUP 1  
     """)
-
-
 if page == "📝 Input Data":
     st.header("Enter Your Details")
     name = st.text_input("Name")
@@ -53,94 +54,79 @@ if page == "📝 Input Data":
     weight = st.number_input("Weight (kg)", 30, 200, 70)
     height = st.number_input("Height (cm)", 100, 250, 170)
     activity = st.selectbox("Activity Level", ["Low", "Moderate", "High"])
-    diet_type = st.selectbox("Diet Preference", ["Vegetarian", "Non-Vegetarian", "Vegan"])
+    diet = st.selectbox("Diet Type", ["Vegetarian", "Non-Vegetarian", "Vegan"])
 
     if st.button("Save Data"):
-        st.session_state['user_data'] = {"name": name, "age": age, "weight": weight,
-                                         "height": height, "activity": activity, "diet_type": diet_type}
-        st.success("✅ Data saved successfully!")
+        st.session_state['user'] = {"name": name, "age": age, "weight": weight,
+                                    "height": height, "activity": activity, "diet": diet}
+        st.success("Data Saved Successfully!")
 
 
-def generate_nutrition_plan(data):
+
+def generate_plan(data):
     bmi = data['weight'] / ((data['height'] / 100) ** 2)
+    calories = data['weight'] * (25 if data['activity']=="Low" else 30 if data['activity']=="Moderate" else 35)
+    return {
+        "Calories": int(calories),
+        "Protein(g)": round(data['weight'] * 1.2),
+        "Carbs(g)": round(calories*0.5/4),
+        "Fats(g)": round(calories*0.25/9),
+        "BMI": round(bmi,2)
+    }
 
-    if data['activity'] == "Low":
-        calories = data['weight'] * 25
-    elif data['activity'] == "Moderate":
-        calories = data['weight'] * 30
-    else:
-        calories = data['weight'] * 35
-
-    protein = data['weight'] * 1.2
-    carbs = calories * 0.5 / 4
-    fats = calories * 0.25 / 9
-    tips = []
-    if bmi < 18.5:
-        tips.append("Increase calorie intake with nutrient-dense foods.")
-    elif bmi > 25:
-        tips.append("Include more vegetables and lean protein for fat loss.")
-    else:
-        tips.append("Maintain balanced meals & steady exercise.")
-
-    return {"Calories": round(calories), "Protein (g)": round(protein),
-            "Carbs (g)": round(carbs), "Fats (g)": round(fats), "Tips": tips}
 if page == "📊 Nutrition Plan":
-    st.header("Your AI-Powered Nutrition Plan")
-    if 'user_data' not in st.session_state:
-        st.warning("⚠ Please enter your data in Input Page First.")
+    st.header("Your AI Nutrition Plan")
+    if "user" not in st.session_state:
+        st.warning("Please enter your details in Input Data page.")
     else:
-        plan = generate_nutrition_plan(st.session_state['user_data'])
-        df = pd.DataFrame({
-            "Nutrient": ["Calories", "Protein (g)", "Carbs (g)", "Fats (g)"],
-            "Target": [plan["Calories"], plan["Protein (g)"], plan["Carbs (g)"], plan["Fats (g)"]]
-        })
-        st.table(df)
-        st.subheader("Personalized Tips")
-        for tip in plan["Tips"]:
-            st.info("💡 " + tip)
+        plan = generate_plan(st.session_state["user"])
+        st.table(pd.DataFrame(plan.items(), columns=["Metric", "Value"]))
+
+
+
+if page == "🍎 Food Finder":
+    st.header("Search Nutrition From Database")
+
+    query = st.text_input("Type a food name (e.g., Banana, Rice, Egg):")
+
+    if query:
+        results = foods_df[foods_df["Food"].str.contains(query, case=False)]
+        if results.empty:
+            st.error("No matching foods found.")
+        else:
+            st.success("Food Found in Dataset:")
+            st.dataframe(results)
+
+        
+            avg_cal = np.mean(results["Calories"])
+            st.info(f"💡 Suggestion: Average calories of searched items = **{avg_cal:.1f} kcal**")
 if page == "🤖 Diet Chatbot":
-    st.header("💬 Nutritional & Balanced Diet Chatbot")
-    user_q = st.text_input("Ask any diet, nutrition or healthy eating question:")
+    st.header("Ask Nutrition / Diet Question")
+    user_q = st.text_input("Question:")
     if st.button("Ask"):
-        st.write("🤖 *AI Suggestion:*")
-        st.success("Maintain balance between protein, carbs, fats & stay hydrated. Avoid junk & processed foods.")
+        st.success("Eat whole foods, manage portion size, stay hydrated & exercise regularly.")
 if page == "💧 Hydration Tracker":
-    st.header("Daily Hydration Tracker")
-    water = st.slider("How many glasses of water did you drink today?", 0, 20, 8)
-    st.progress(water / 20)
-    if water < 8:
-        st.warning("⚠ Drink more water to reach your daily hydration target.")
-    else:
-        st.success("💧 Excellent! Stay consistent.")
+    st.header("Daily Water Intake")
+    glasses = st.slider("Glasses of water today", 0, 20, 6)
+    st.progress(glasses/20)
+    st.write("Daily Goal: 8–12 glasses")
 if page == "🏋️ Simple Exercises":
-    st.header("Simple Exercises by Category")
-    category = st.selectbox("Choose Body Area", ["Arms", "Legs", "Core", "Full Body"])
-    if category == "Arms":
-        st.write("💪 Pushups, Arm Circles, Tricep dips")
-    elif category == "Legs":
-        st.write("🏃 Squats, Lunges, Leg Raises")
-    elif category == "Core":
-        st.write("🔥 Plank, Crunches, Mountain Climbers")
-    else:
-        st.write("💥 Jumping Jacks, Burpees, Skipping Rope")
-    st.warning("⚠ DISCLAIMER: Perform exercises carefully. Stop if uncomfortable.")
+    st.header("Exercise Suggestions from Dataset")
+
+    muscle = st.selectbox("Choose category", ex_df["Category"].unique())
+
+    selected = ex_df[ex_df["Category"] == muscle]
+    st.table(selected[["Exercise", "Duration(min)", "Calories Burned"]])
 if page == "📅 Meal Forecasting":
-    st.header("Weekly Balanced Diet & Meal Schedule")
-    schedule = pd.DataFrame({
-        "Day": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        "Meals": ["High protein", "Balanced carbs", "Hydration focus", "Fiber rich",
-                  "Lean meat/Paneer", "Cheat lite day", "Fruit + Salad Day"]
-    })
+    st.header("Weekly Diet Schedule")
+    schedule = pd.DataFrame({"Day":["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+                             "Meals":["High Protein","Veg Balanced","Hydration","Fiber Rich",
+                                      "Lean Protein","Light Cheat","Smoothies/Fruits"]})
     st.table(schedule)
 if page == "💡 Smart Tips":
-    st.header("AI Smart Recommendations")
-    tips = [
-        "Drink 2–3 liters of water daily.",
-        "Sleep 7–8 hours for recovery.",
-        "Combine cardio & strength training.",
-        "Avoid sugary drinks.",
-        "Eat whole grains & fresh vegetables."
-    ]
+    st.header("Smart Recommendations")
+    tips = ["Drink 2-3 liters water daily","7-8 hrs sleep","Add protein to every meal",
+            "Avoid sugary foods","Exercise 30 mins daily"]
     for t in tips:
-        st.success("✅ " + t)
+        st.success("✔ " + t)
 
