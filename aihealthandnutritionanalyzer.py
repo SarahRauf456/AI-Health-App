@@ -2,23 +2,54 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-@st.cache_data
-def load_food_data():
-    df1 = pd.read_csv("data/foods.csv")
-    df2 = pd.read_csv("data/foods2.csv")
 
+st.set_page_config(page_title="AI Health & Nutrition Analyzer", layout="wide")
+
+@st.cache_data
+def load_exercise_data():
+    """
+    Load and combine exercise CSVs, handling missing columns and null values.
+    """
+    
+    try:
+        df1 = pd.read_csv("data/exercises.csv")
+    except FileNotFoundError:
+        df1 = pd.DataFrame()  
+
+    try:
+        df2 = pd.read_csv("data/exercises2.csv")
+    except FileNotFoundError:
+        df2 = pd.DataFrame()
 
     df1.columns = df1.columns.str.strip()
     df2.columns = df2.columns.str.strip()
 
+    if "Category" not in df1.columns:
+        df1["Category"] = "Unknown"
+    if "Category" not in df2.columns:
+        df2["Category"] = "Unknown"
 
-@st.cache_data
-def load_exercise_data():
-    return pd.read_csv("data/exercises.csv")
 
-foods_df = load_food_data()
+    if "Exercise" not in df1.columns:
+        df1["Exercise"] = "Unknown"
+    if "Exercise" not in df2.columns:
+        df2["Exercise"] = "Unknown"
+
+
+    combined_df = pd.concat([df1, df2], ignore_index=True)
+    combined_df["Category"] = combined_df["Category"].astype(str).str.strip()
+    combined_df["Exercise"] = combined_df["Exercise"].astype(str).str.strip()
+
+    return combined_df
+
 ex_df = load_exercise_data()
 
+categories = ex_df["Category"].unique() if "Category" in ex_df.columns else ["Unknown"]
+muscle = st.selectbox("Choose category", categories)
+
+filtered_exercises = ex_df[ex_df["Category"] == muscle]
+
+st.dataframe(filtered_exercises)
 st.markdown("""
     <style>
         body {
