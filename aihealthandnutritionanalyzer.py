@@ -94,7 +94,7 @@ if page == "🏠 Home":
     st.write("""
     Our AI system generates personalized nutrition plans, hydration tracking,
     workout suggestions and weekly meal planning based on your profile.
-    PROJECT BY : GROUP 1 SHARFIA, NOVESH, AKASH, AHANA, HARSH.
+    PROJECT BY : GROUP 1 SHARFIA, AKASH, AHANA, NOVESH, HARSH.
     """)
 
 if page == "📝 Input Data":
