@@ -122,9 +122,6 @@ TOKEN = st.secrets["GITHUB_TOKEN"]
 REPO = "https://github.com/SarahRauf456/AI-Health-App"
 FILE_PATH = "data/users.csv"
 
-g = Github(TOKEN)
-repo = g.get_repo(REPO)
-
 def read_csv_from_github():
     file = repo.get_contents(FILE_PATH)
     df = pd.read_csv(StringIO(file.decoded_content.decode()))
@@ -132,6 +129,8 @@ def read_csv_from_github():
 
 def update_csv_in_github(csv_string, sha):
     repo.update_file(FILE_PATH, "update stats", csv_string, sha)
+TOKEN = st.secrets["GITHUB_TOKEN"]        
+REPO = st.secrets["GITHUB_REPO"]
 
 
 
