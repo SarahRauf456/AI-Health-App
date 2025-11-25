@@ -116,7 +116,10 @@ if page == "📝 Input Data":
     height = st.number_input("Height (cm)", 100, 250, 170)
     activity = st.selectbox("Activity Level", ["Low", "Moderate", "High"])
     diet_type = st.selectbox("Diet Preference", ["Vegetarian", "Non-Vegetarian", "Vegan"])
-
+if st.button("Save Data"):
+    st.session_state['user_data'] = {"name": name, "age": age, "weight": weight,
+                                         "height": height, "activity": activity, "diet_type": diet_type}
+    st.success("✅ Data saved successfully!")
 
 TOKEN = st.secrets["GITHUB_TOKEN"]
 REPO = "https://github.com/SarahRauf456/AI-Health-App"
