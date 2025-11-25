@@ -186,19 +186,20 @@ if page == "🤖 Diet Chatbot":
     if st.button("Ask"):
         st.write("🤖 AI Suggestion:")
         st.success("Maintain balance between protein, carbs, fats & stay hydrated. Avoid junk & processed foods.")
-
 if page == "💧 Hydration Tracker":
     st.header("Daily Hydration Tracker")
     water = st.slider("How many glasses of water did you drink today?", 0, 20, 8)
     st.progress(water / 20)
+
     if water < 8:
         st.warning("⚠ Drink more water to reach your daily hydration target.")
     else:
         st.success("💧 Excellent! Stay consistent.")
-        
- if st.button("Save Hydration"):
-    log_activity("hydration_saved", f"Water: {water_intake} ml")
-    st.success("Hydration saved!")
+
+    if st.button("Save Hydration"):
+        log_activity("hydration_saved", f"Water: {water} glasses")
+        st.success("Hydration saved!")
+
      
 
 if page == "🏋 Simple Exercises":
