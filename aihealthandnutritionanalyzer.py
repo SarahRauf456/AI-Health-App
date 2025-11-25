@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import pandas as pd
 import requests
+from io import StringIO
 
 CSV_URL = "https://raw.githubusercontent.com/SarahRauf456/AI-Health-App/refs/heads/main/data/users.csv"
 
@@ -116,8 +117,6 @@ if page == "📝 Input Data":
     activity = st.selectbox("Activity Level", ["Low", "Moderate", "High"])
     diet_type = st.selectbox("Diet Preference", ["Vegetarian", "Non-Vegetarian", "Vegan"])
 
-from github import Github
-from io import StringIO
 
 TOKEN = st.secrets["GITHUB_TOKEN"]
 REPO = "https://github.com/SarahRauf456/AI-Health-App"
