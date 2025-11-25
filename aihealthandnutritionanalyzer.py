@@ -6,7 +6,13 @@ import requests
 from io import StringIO
 
 CSV_URL = "https://raw.githubusercontent.com/SarahRauf456/AI-Health-App/refs/heads/main/data/users.csv"
-
+def log_activity(event, details=""):
+    new_entry = {
+        "timestamp": pd.Timestamp.now(),
+        "event": event,
+        "details": details
+    }
+    append_to_csv(new_entry)  
 def load_data():
     return pd.read_csv(CSV_URL)
 
@@ -117,9 +123,11 @@ if page == "📝 Input Data":
     activity = st.selectbox("Activity Level", ["Low", "Moderate", "High"])
     diet_type = st.selectbox("Diet Preference", ["Vegetarian", "Non-Vegetarian", "Vegan"])
 if st.button("Save Data"):
-    st.session_state['user_data'] = {"name": name, "age": age, "weight": weight,
+        st.session_state['user_data'] = {"name": name, "age": age, "weight": weight,
                                          "height": height, "activity": activity, "diet_type": diet_type}
-    st.success("✅ Data saved successfully!")
+        st.success("✅ Data saved successfully!")
+
+
 
 TOKEN = st.secrets["GITHUB_TOKEN"]
 REPO = "https://github.com/SarahRauf456/AI-Health-App"
@@ -187,6 +195,10 @@ if page == "💧 Hydration Tracker":
         st.warning("⚠ Drink more water to reach your daily hydration target.")
     else:
         st.success("💧 Excellent! Stay consistent.")
+ if st.button("Save Hydration"):
+    log_activity("hydration_saved", f"Water: {water_intake} ml")
+    st.success("Hydration saved!")
+     
 
 if page == "🏋 Simple Exercises":
     st.header("Simple Exercises by Category")
@@ -195,6 +207,10 @@ if page == "🏋 Simple Exercises":
     filtered_exercises = ex_df[ex_df["Category"] == selected_ex_category]
     st.dataframe(filtered_exercises)
     st.warning("⚠ DISCLAIMER: Perform exercises carefully. Stop if uncomfortable.")
+if st.button("Save Workout"):
+    log_activity("workout_saved", f"Workout: {selected_workout}, Duration: {duration} mins")
+    st.success("Workout saved!")
+
 
 if page == "📅 Meal Forecasting":
     st.header("Weekly Balanced Diet & Meal Schedule")
@@ -204,6 +220,9 @@ if page == "📅 Meal Forecasting":
                   "Lean meat/Paneer", "Cheat lite day", "Fruit + Salad Day"]
     })
     st.table(schedule)
+if st.button("Save Meal Plan"):
+    log_activity("meal_plan_saved", f"Meal: {meal_result}")
+    st.success("Meal data saved!")
 
 if page == "💡 Smart Tips":
     st.header("AI Smart Recommendations")
@@ -216,9 +235,10 @@ if page == "💡 Smart Tips":
     ]
     for t in tips:
         st.success("✅ " + t)
+        
 
 
-if page == "📊 Nutrition Plan":  # example: reuse foods_df if needed
+if page == "📊 Nutrition Plan":  
     st.subheader("Search Foods")
     food_query = st.text_input("Search for a food:", key="food_search")
     if food_query:
@@ -228,29 +248,75 @@ if page == "📊 Nutrition Plan":  # example: reuse foods_df if needed
         else:
             st.dataframe(results)
 
+# --------------------- Dashboard Page ---------------------
+
 if page == "📈 Dashboard":
     st.header("📊 Activity Dashboard")
-    df = load_data()
+
+    # Convert the GitHub CSV data to DataFrame
+    df = pd.DataFrame(records)
 
     if df.empty:
         st.info("No activity recorded yet.")
     else:
-        st.subheader("Your Last 10 Activities")
+        # Show last 10 actions
+        st.subheader("🕒 Last 10 Activities")
         st.dataframe(df.tail(10))
 
-        # Group events for pie chart
+        # ------------ Pie Chart: Activity Breakdown ------------
+        st.subheader("📦 Activity Breakdown")
         event_counts = df["event"].value_counts()
-
-        st.subheader("Activity Breakdown")
-        import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
         ax.pie(event_counts, labels=event_counts.index, autopct="%1.1f%%")
         ax.set_facecolor("#0f0f0f")
         fig.patch.set_facecolor("#0f0f0f")
         st.pyplot(fig)
-        plt.rcParams.update({
-    "text.color": "white",
-})
+
+        # ------------ Hydration Chart ------------
+        hydration_data = df[df["event"] == "hydration_saved"].copy()
+        if not hydration_data.empty:
+            hydration_data["timestamp"] = pd.to_datetime(hydration_data["timestamp"])
+            hydration_data["water_ml"] = (
+                hydration_data["details"].str.extract(r"(\d+)").astype(int)
+            )
+
+            st.subheader("💧 Hydration History")
+            fig2, ax2 = plt.subplots()
+            ax2.plot(hydration_data["timestamp"], hydration_data["water_ml"])
+            ax2.set_xlabel("Time")
+            ax2.set_ylabel("Water (ml)")
+            ax2.set_facecolor("#0f0f0f")
+            fig2.patch.set_facecolor("#0f0f0f")
+            st.pyplot(fig2)
+        else:
+            st.info("No hydration data yet.")
+
+        # ------------ Exercise Chart ------------
+        exercise_data = df[df["event"] == "workout_saved"].copy()
+        if not exercise_data.empty:
+            exercise_data["timestamp"] = pd.to_datetime(exercise_data["timestamp"])
+            exercise_data["duration"] = (
+                exercise_data["details"].str.extract(r"(\d+)").astype(int)
+            )
+
+            st.subheader("🏋️ Exercise Duration Over Time")
+            fig3, ax3 = plt.subplots()
+            ax3.plot(exercise_data["timestamp"], exercise_data["duration"])
+            ax3.set_xlabel("Time")
+            ax3.set_ylabel("Minutes")
+            ax3.set_facecolor("#0f0f0f")
+            fig3.patch.set_facecolor("#0f0f0f")
+            st.pyplot(fig3)
+        else:
+            st.info("No workout data yet.")
+
+        # ------------ Meal Data Table ------------
+        meal_data = df[df["event"] == "meal_plan_saved"]
+        st.subheader("🍱 Saved Meal Plans")
+        if not meal_data.empty:
+            st.dataframe(meal_data[["timestamp", "details"]])
+        else:
+            st.info("No meal plans saved yet.")
 
 
