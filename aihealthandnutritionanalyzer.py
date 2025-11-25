@@ -148,7 +148,7 @@ if page == "📝 Input Data":
                                          "height": height, "activity": activity, "diet_type": diet_type}
         st.success("✅ Data saved successfully!")
     if st.button("Save Data"):
-    df, sha = read_csv_from_github()
+        df, sha = read_csv_from_github()
     
     new_row = {
         "name": name,
