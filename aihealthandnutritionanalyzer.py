@@ -195,6 +195,7 @@ if page == "💧 Hydration Tracker":
         st.warning("⚠ Drink more water to reach your daily hydration target.")
     else:
         st.success("💧 Excellent! Stay consistent.")
+        
  if st.button("Save Hydration"):
     log_activity("hydration_saved", f"Water: {water_intake} ml")
     st.success("Hydration saved!")
@@ -207,6 +208,7 @@ if page == "🏋 Simple Exercises":
     filtered_exercises = ex_df[ex_df["Category"] == selected_ex_category]
     st.dataframe(filtered_exercises)
     st.warning("⚠ DISCLAIMER: Perform exercises carefully. Stop if uncomfortable.")
+    
 if st.button("Save Workout"):
     log_activity("workout_saved", f"Workout: {selected_workout}, Duration: {duration} mins")
     st.success("Workout saved!")
@@ -220,6 +222,7 @@ if page == "📅 Meal Forecasting":
                   "Lean meat/Paneer", "Cheat lite day", "Fruit + Salad Day"]
     })
     st.table(schedule)
+    
 if st.button("Save Meal Plan"):
     log_activity("meal_plan_saved", f"Meal: {meal_result}")
     st.success("Meal data saved!")
