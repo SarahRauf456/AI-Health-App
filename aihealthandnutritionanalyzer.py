@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import requests
 
-CSV_URL = "https://github.com/SarahRauf456/AI-Health-App/blob/main/data/users.csv"
+CSV_URL = "https://raw.githubusercontent.com/SarahRauf456/AI-Health-App/refs/heads/main/data/users.csv"
 
 def load_data():
     return pd.read_csv(CSV_URL)
