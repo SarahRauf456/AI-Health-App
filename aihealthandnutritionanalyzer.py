@@ -129,10 +129,6 @@ def read_csv_from_github():
 
 def update_csv_in_github(csv_string, sha):
     repo.update_file(FILE_PATH, "update stats", csv_string, sha)
-TOKEN = st.secrets["GITHUB_TOKEN"]        
-REPO = st.secrets["GITHUB_REPO"]
-
-
 
 def generate_nutrition_plan(data):
     bmi = data['weight'] / ((data['height'] / 100) ** 2)
