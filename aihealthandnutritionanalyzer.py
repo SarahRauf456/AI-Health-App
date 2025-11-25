@@ -1,42 +1,15 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import requests
-import base64
 import pandas as pd
-import streamlit as st
-from datetime import datetime
+import requests
 
-TOKEN = st.secrets["GITHUB_TOKEN"]
-OWNER = st.secrets["REPO_OWNER"]
-REPO = st.secrets["REPO_NAME"]
-FILE_PATH = st.secrets["FILE_PATH"]
+CSV_URL = "https://github.com/SarahRauf456/AI-Health-App/blob/main/data/users.csv"
 
-def read_csv_from_github():
-    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/{FILE_PATH}"
-    headers = {"Authorization": f"token {TOKEN}"}
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        content = base64.b64decode(response.json()['content']).decode('utf-8')
-        df = pd.read_csv(pd.compat.StringIO(content))
-        return df, response.json()['sha']
-    else:
-        return pd.DataFrame(), ""
+def load_data():
+    return pd.read_csv(CSV_URL)
 
-def update_csv_to_github(df, sha):
-    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/{FILE_PATH}"
-    headers = {"Authorization": f"token {TOKEN}"}
-    
-    new_content = df.to_csv(index=False).encode()
-    encoded = base64.b64encode(new_content).decode()
-    
-    data = {
-        "message": "update data",
-        "content": encoded,
-        "sha": sha
-    }
-    requests.put(url, json=data, headers=headers)
+df = load_data()
 
 
 st.set_page_config(page_title="AI Health & Nutrition Analyzer", layout="wide")
@@ -143,27 +116,24 @@ if page == "📝 Input Data":
     activity = st.selectbox("Activity Level", ["Low", "Moderate", "High"])
     diet_type = st.selectbox("Diet Preference", ["Vegetarian", "Non-Vegetarian", "Vegan"])
 
-    if st.button("Save Data"):
-        st.session_state['user_data'] = {"name": name, "age": age, "weight": weight,
-                                         "height": height, "activity": activity, "diet_type": diet_type}
-        st.success("✅ Data saved successfully!")
-    if st.button("Save Data"):
-        df, sha = read_csv_from_github()
-    
-    new_row = {
-        "name": name,
-        "age": age,
-        "weight": weight,
-        "height": height,
-        "activity": activity,
-        "diet_type": diet_type,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
+from github import Github
+from io import StringIO
 
-    df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-    update_csv_to_github(df, sha)
-    
-    st.success("Saved to GitHub CSV successfully!")
+TOKEN = st.secrets["GITHUB_TOKEN"]
+REPO = "https://github.com/SarahRauf456/AI-Health-App"
+FILE_PATH = "data/users.csv"
+
+g = Github(TOKEN)
+repo = g.get_repo(REPO)
+
+def read_csv_from_github():
+    file = repo.get_contents(FILE_PATH)
+    df = pd.read_csv(StringIO(file.decoded_content.decode()))
+    return df, file.sha
+
+def update_csv_in_github(csv_string, sha):
+    repo.update_file(FILE_PATH, "update stats", csv_string, sha)
+
 
 
 def generate_nutrition_plan(data):
@@ -263,8 +233,7 @@ if page == "📊 Nutrition Plan":  # example: reuse foods_df if needed
 
 if page == "📈 Dashboard":
     st.header("📊 Activity Dashboard")
-    records = sheet.get_all_records()
-    df = pd.DataFrame(records)
+    df = load_data()
 
     if df.empty:
         st.info("No activity recorded yet.")
