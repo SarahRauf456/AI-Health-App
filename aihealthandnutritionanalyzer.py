@@ -30,7 +30,7 @@ st.write("Personalized health, diet, hydration and exercise recommendations.")
 
 page = st.sidebar.selectbox(
     "Navigate",
-    ["🏠 Home", "📝 Input Data", "📊 Nutrition Plan", "🤖 Diet Chatbot",
+    ["📈 Dashboard", "🏠 Home", "📝 Input Data", "📊 Nutrition Plan", "🤖 Diet Chatbot",
      "💧 Hydration Tracker", "🏋 Simple Exercises", "📅 Meal Forecasting", "💡 Smart Tips"]
 )
 
@@ -205,5 +205,31 @@ if page == "📊 Nutrition Plan":  # example: reuse foods_df if needed
             st.info("No foods found matching your query.")
         else:
             st.dataframe(results)
+
+if page == "📈 Dashboard":
+    st.header("📊 Activity Dashboard")
+    records = sheet.get_all_records()
+    df = pd.DataFrame(records)
+
+    if df.empty:
+        st.info("No activity recorded yet.")
+    else:
+        st.subheader("Your Last 10 Activities")
+        st.dataframe(df.tail(10))
+
+        # Group events for pie chart
+        event_counts = df["event"].value_counts()
+
+        st.subheader("Activity Breakdown")
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        ax.pie(event_counts, labels=event_counts.index, autopct="%1.1f%%")
+        ax.set_facecolor("#0f0f0f")
+        fig.patch.set_facecolor("#0f0f0f")
+        st.pyplot(fig)
+        plt.rcParams.update({
+    "text.color": "white",
+})
 
 
