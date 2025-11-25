@@ -1,6 +1,43 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import requests
+import base64
+import pandas as pd
+import streamlit as st
+from datetime import datetime
+
+TOKEN = st.secrets["GITHUB_TOKEN"]
+OWNER = st.secrets["REPO_OWNER"]
+REPO = st.secrets["REPO_NAME"]
+FILE_PATH = st.secrets["FILE_PATH"]
+
+def read_csv_from_github():
+    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/{FILE_PATH}"
+    headers = {"Authorization": f"token {TOKEN}"}
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        content = base64.b64decode(response.json()['content']).decode('utf-8')
+        df = pd.read_csv(pd.compat.StringIO(content))
+        return df, response.json()['sha']
+    else:
+        return pd.DataFrame(), ""
+
+def update_csv_to_github(df, sha):
+    url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/{FILE_PATH}"
+    headers = {"Authorization": f"token {TOKEN}"}
+    
+    new_content = df.to_csv(index=False).encode()
+    encoded = base64.b64encode(new_content).decode()
+    
+    data = {
+        "message": "update data",
+        "content": encoded,
+        "sha": sha
+    }
+    requests.put(url, json=data, headers=headers)
+
 
 st.set_page_config(page_title="AI Health & Nutrition Analyzer", layout="wide")
 
@@ -110,6 +147,24 @@ if page == "📝 Input Data":
         st.session_state['user_data'] = {"name": name, "age": age, "weight": weight,
                                          "height": height, "activity": activity, "diet_type": diet_type}
         st.success("✅ Data saved successfully!")
+    if st.button("Save Data"):
+    df, sha = read_csv_from_github()
+    
+    new_row = {
+        "name": name,
+        "age": age,
+        "weight": weight,
+        "height": height,
+        "activity": activity,
+        "diet_type": diet_type,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+    update_csv_to_github(df, sha)
+    
+    st.success("Saved to GitHub CSV successfully!")
+
 
 def generate_nutrition_plan(data):
     bmi = data['weight'] / ((data['height'] / 100) ** 2)
