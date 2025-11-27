@@ -149,17 +149,30 @@ import streamlit as st
 from datetime import datetime, timedelta
 import plotly.express as px
 import plotly.graph_objects as go
+# --- PATH CONFIGURATION START ---
+
+# 1. Get the directory where THIS file (new_backend.py) is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 2. Define a helper to join paths safely
+def get_path(filename):
+    return os.path.join(BASE_DIR, filename)
+
+# 3. Update FILES dictionary to use the dynamic paths
 FILES = {
-    "profile": "user_profile.json",
-    "food_log": "food_log.csv",
-    "exercise_log": "exercise_log.csv",
-    "water_log": "water_log_detailed.csv",
-    "weight_log": "weight_log.csv",
-    "custom_food": "custom_foods.csv",
-    "food_db": "Enhanced_Indian_Food_Nutrition.csv",
-    "exercise_db": "Compendium_of_Physical_Activities_2024.csv",
-    "symptom_db": "symptom_database.csv",
+    "profile": get_path("user_profile.json"),
+    "food_log": get_path("food_log.csv"),
+    "exercise_log": get_path("exercise_log.csv"),
+    "water_log": get_path("water_log_detailed.csv"),
+    "weight_log": get_path("weight_log.csv"),
+    "custom_food": get_path("custom_foods.csv"),
+    # Static Databases (Ensure these exist in your GitHub repo)
+    "food_db": get_path("Enhanced_Indian_Food_Nutrition.csv"),
+    "exercise_db": get_path("Compendium_of_Physical_Activities_2024.csv"),
+    "symptom_db": get_path("symptom_database.csv"),
 }
+# --- PATH CONFIGURATION END ---
+
 # Hydration Constants
 HYDRATION_FACTORS = {
     "Water": 1.0, "Milk": 0.99, "Tea": 0.98, "Coffee": 0.90,
