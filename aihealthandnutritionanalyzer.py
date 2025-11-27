@@ -136,6 +136,11 @@ else: #Load Databases
             results = df_food[df_food["Dish Name"].str.contains(food_query, case=False, na=False)]
             if results.empty:
                 st.info("No foods found matching your query.")
-            else:
+           else:
+                st.dataframe(results)
+    if page=="📊 Analytics":
+        show_analytics_ad()
+    if page=="⚙️ Settings":
+        show_settings(user)
 
 
