@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import json
+import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 from new_backend import FILES,initialize_databases, load_profile, save_profile, get_daily_stats, load_all_databases, show_food_log,show_hydration, show_health_advisor,show_fitness, show_analytics_ad,show_settings,generate_nutrition_plan,show_dashboard
