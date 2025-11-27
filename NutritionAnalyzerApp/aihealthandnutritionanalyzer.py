@@ -696,3 +696,9 @@ def show_dashboard(user):
         st.subheader("⚖️ Weight")
         cw = user.get("Current_Weight", user["Start_Weight"])
         st.metric("Current", f"{cw} kg", delta=f"{cw - user['Start_Weight']:.1f} kg")
+Dish Name,Calories (kcal),Carbohydrates (g),Protein (g),Fats (g),Free Sugar (g),Fibre (g),Sodium (mg),Calcium (mg),Iron (mg),Vitamin C (mg),Folate (µg),Cholesterol (mg),Serving Unit,Serving Weight (g),Calories per Serving,Protein per Serving (g)
+Hot tea (Garam Chai),16.14,2.58,0.39,0.53,2.58,0.0,3.12,14.2,0.02,0.5,1.8,0.0,1 cup,150,24.2,0.6
+Instant coffee,23.16,3.65,0.64,0.75,3.62,0.0,4.92,20.87,0.06,1.51,5.6,0.0,1 cup,150,34.7,1.0
+Espreso coffee,51.54,6.62,1.75,2.14,6.53,0.0,13.98,58.1,0.15,1.51,5.53,0.0,1 cup,150,77.3,2.6
+Iced tea,10.34,2.7,0.03,0.01,2.7,0.0,0.23,1.18,0.02,5.95,1.28,0.0,1 cup,150,15.5,0.0
+Raw mango drink (Aam panna),35.92,9.05,0.16,0.03,7.49,0.61,79.82,7.08,0.14,45.3,14.05,0.0,100g portion,100,35.9,0.2
