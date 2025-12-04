@@ -6,13 +6,11 @@ import plotly.graph_objects as go
 import numpy as np
 from new_backend import FILES,initialize_databases, load_profile, save_profile, get_daily_stats, load_all_databases, show_food_log,show_hydration, show_health_advisor,show_fitness, show_analytics_ad,show_settings,generate_nutrition_plan,show_dashboard
 
-
 initialize_databases()
 if "user" not in st.session_state:
     st.session_state["user"] = load_profile()
 user=st.session_state["user"]
 
-#View1
 if user is None:
     st.title("🤖🩺 AI Health & Nutrition Analyzer")
     st.markdown("### Let's build your personalized health plan.")
@@ -129,7 +127,7 @@ else: #Load Databases
             st.success("✅ " + t)
 
 
-    if page == "📊 Nutrition Plan":  # example: reuse foods_df if needed
+    if page == "📊 Nutrition Plan":  
         st.subheader("Search Foods")
         food_query = st.text_input("Search for a food:", key="food_search")
         if food_query:
