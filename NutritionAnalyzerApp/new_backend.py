@@ -1,4 +1,5 @@
 
+
 import pandas as pd
 import json
 import os
@@ -31,13 +32,13 @@ HYDRATION_FACTORS = {
 
 def initialize_databases():
     if not os.path.exists(FILES["food_log"]):
-        pd.DataFrame(columns=["Date","Time","Dish","Meal Type","Qunatity","Calories","Protein", "Carbs", "Fats"].to_csv(FILES["food_log"],index=False))
+        pd.DataFrame(columns=["Date","Time","Dish","Meal Type","Qunatity","Calories","Protein", "Carbs", "Fats"]).to_csv(FILES["food_log"],index=False)
     if not os.path.exists(FILES["water_log"]):  
-        pd.DataFrame(columns=["Date","Time","Beverage","Volume_ml","Effective_Hydration_ml"].to_csv(FILES["water_log"],index=False))
+        pd.DataFrame(columns=["Date","Time","Beverage","Volume_ml","Effective_Hydration_ml"]).to_csv(FILES["water_log"],index=False)
     if not os.path.exists(FILES["weight_log"]):
-        pd.DataFrame(columns=["Date","weight"].to_csv(FILES["weight_log"],index=False))
+        pd.DataFrame(columns=["Date","weight"]).to_csv(FILES["weight_log"],index=False)
     if not os.path.exists(FILES["exercise_log"]):
-        pd.DataFrame(columns=["Date","Time","Activity","Duration","Calories Burnt"].to_csv(FILES["exercise_log"],index=False))                            
+        pd.DataFrame(columns=["Date","Time","Activity","Duration","Calories Burnt"]).to_csv(FILES["exercise_log"],index=False)                      
 
 def load_data_safe(filepath):
     if os.path.exists(filepath):
